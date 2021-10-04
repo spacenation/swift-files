@@ -17,9 +17,12 @@ final public class Directory: ObservableObject, DirectoryMonitorDelegate {
     
     func directoryMonitorDidObserveChange(directoryMonitor: DirectoryMonitor) {
         DispatchQueue.main.async {
-            print("Update")
             self.files[0] = directoryMonitor.url.tree
         }
+    }
+    
+    deinit {
+        directoryMonitor?.stopMonitoring()
     }
 }
 
