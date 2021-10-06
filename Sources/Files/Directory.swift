@@ -2,22 +2,24 @@ import Foundation
 @_exported import Tree
 
 final public class Directory: ObservableObject, DirectoryMonitorDelegate {
-    @Published public internal(set) var files: [NonEmptyTree<URL>] = []
+    @Published public internal(set) var filesTree: NonEmptyTree<URL>?
     var directoryMonitor: DirectoryMonitor?
     
     public init() {
     }
     
     public func addTree(url: URL) {
-        self.files.append(url.tree)
-        self.directoryMonitor = DirectoryMonitor(url: url)
-        self.directoryMonitor?.delegate = self
-        self.directoryMonitor?.startMonitoring()
+        if url.hasDirectoryPath {
+            self.filesTree = url.tree
+            self.directoryMonitor = DirectoryMonitor(url: url)
+            self.directoryMonitor?.delegate = self
+            self.directoryMonitor?.startMonitoring()
+        }
     }
     
     func directoryMonitorDidObserveChange(directoryMonitor: DirectoryMonitor) {
         DispatchQueue.main.async {
-            self.files[0] = directoryMonitor.url.tree
+            self.filesTree = directoryMonitor.url.tree
         }
     }
     
